@@ -1,0 +1,77 @@
+name: Create a release and deploy to NuGet
+
+on:
+  push:
+    tags:
+    - "v*"
+
+env:
+  PROJECT_PATH: ciphers/ciphers/ciphers.csproj
+  PACKAGE_PATH: ${{ github.workspace }}/package
+  PACKAGE_ARTIFACT_NAME: package
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Check if branch is main
+      if: endsWith(github.event.base_ref, 'main') == false
+      run: exit -1
+        
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+        
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.PROJECT_PATH }}
+      
+    - name: Build
+      run: dotnet build ${{ env.PROJECT_PATH }} --no-restore -c Release
+
+    - name: Create NuGet package
+      run: |
+        VERSION=${GITHUB_REF_NAME#v}
+        dotnet pack ${{ env.PROJECT_PATH }} --no-restore --no-build -c Release --include-symbols -p:PackageVersion=${VERSION} -o ${{ env.PACKAGE_PATH }}
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.PACKAGE_ARTIFACT_NAME }}
+        path: ${{ env.PACKAGE_PATH }}
+        if-no-files-found: error
+        overwrite: true
+        
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    needs: [pack]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ env.PACKAGE_ARTIFACT_NAME }}
+        path: ${{ env.PACKAGE_PATH }}
+
+    - name: Create release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        generate_release_notes: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Push package to GitHub Packages
+      run: |
+        dotnet nuget add source --username MoudryDaniel --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/MoudryDaniel/index.json"
+        dotnet nuget push ${{ env.PACKAGE_PATH }}/*.nupkg  -k ${{ secrets.GITHUB_TOKEN }} -s "github"
+
+    - name: Push package to NuGet Gallery
+      run: dotnet nuget push ${{ env.PACKAGE_PATH }}/*.nupkg -k {{ secrects.NUGET_API_KEY }} -s "https://api.nuget.org/v3/index.json"
