@@ -5,6 +5,8 @@ VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ciphers", "ciphers\ciphers.csproj", "{35E275AD-9229-4937-9603-757368398EC9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ciphers.Tests", "ciphers.Tests\ciphers.Tests.csproj", "{0760DA45-4774-4A14-A568-D4C172A54A61}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{35E275AD-9229-4937-9603-757368398EC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35E275AD-9229-4937-9603-757368398EC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35E275AD-9229-4937-9603-757368398EC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0760DA45-4774-4A14-A568-D4C172A54A61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0760DA45-4774-4A14-A568-D4C172A54A61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0760DA45-4774-4A14-A568-D4C172A54A61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0760DA45-4774-4A14-A568-D4C172A54A61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
